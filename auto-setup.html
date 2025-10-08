@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase 配置助手 - 古诗词游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .step {
+            margin-bottom: 40px;
+            padding: 25px;
+            border: 2px solid #f0f0f0;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .step:hover {
+            border-color: #4facfe;
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.1);
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background: #4facfe;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            font-weight: bold;
+            margin-right: 15px;
+            margin-bottom: 15px;
+        }
+
+        .step h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .step p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .input-group {
+            margin: 20px 0;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4facfe, #00f2fe);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+
+        .link {
+            color: #4facfe;
+            text-decoration: none;
+            padding: 8px 15px;
+            border: 1px solid #4facfe;
+            border-radius: 20px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .link:hover {
+            background: #4facfe;
+            color: white;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Supabase 配置助手</h1>
+            <p>为古诗词游戏轻松配置 Supabase 数据库</p>
+            <div style="margin-top: 20px;">
+                <a href="simple-setup.html" style="background: linear-gradient(45deg, #28a745, #20c997); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; margin-right: 10px;">🛠️ 简易配置 (推荐)</a>
+                <a href="one-click-setup.html" style="background: linear-gradient(45deg, #ff6b6b, #ee5a24); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; margin-right: 10px;">⚡ 一键配置</a>
+                <a href="setup-supabase.md" target="_blank" style="background: linear-gradient(45deg, #17a2b8, #6f42c1); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none;">📖 详细指南</a>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <!-- 步骤 1: 创建项目 -->
+            <div class="step" id="step1">
+                <span class="step-number">1</span>
+                <h3>创建 Supabase 项目</h3>
+                <p>首先需要在 Supabase 官网创建一个新项目。</p>
+                
+                <div class="links">
+                    <a href="https://supabase.com" target="_blank" class="link">🌐 访问 Supabase 官网</a>
+                    <a href="https://app.supabase.com" target="_blank" class="link">📱 打开控制台</a>
+                </div>
+
+                <div class="warning">
+                    <strong>📝 创建项目时请记录：</strong><br>
+                    • 项目名称：建议使用 "古诗词游戏" 或 "poem-game"<br>
+                    • 数据库密码：请设置一个强密码并记住<br>
+                    • 区域：推荐选择 "Southeast Asia (Singapore)"
+                </div>
+
+                <button class="btn" onclick="nextStep(2)">项目已创建，下一步 →</button>
+            </div>
+
+            <!-- 步骤 2: 获取配置信息 -->
+            <div class="step hidden" id="step2">
+                <span class="step-number">2</span>
+                <h3>获取项目配置信息</h3>
+                <p>在 Supabase 项目中获取 URL 和 API 密钥。</p>
+
+                <div class="warning">
+                    <strong>📍 操作步骤：</strong><br>
+                    1. 在项目仪表板中，点击左侧菜单的 "Settings"<br>
+                    2. 选择 "API" 选项卡<br>
+                    3. 复制 "Project URL" 和 "anon public" 密钥
+                </div>
+
+                <div class="input-group">
+                    <label for="projectUrl">项目 URL (Project URL):</label>
+                    <input type="text" id="projectUrl" placeholder="https://xxxxx.supabase.co">
+                </div>
+
+                <div class="input-group">
+                    <label for="anonKey">匿名密钥 (anon public key):</label>
+                    <input type="text" id="anonKey" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+                </div>
+
+                <button class="btn" onclick="validateConfig()">验证配置</button>
+                <button class="btn btn-secondary" onclick="prevStep(1)">← 上一步</button>
+            </div>
+
+            <!-- 步骤 3: 创建数据库表 -->
+            <div class="step hidden" id="step3">
+                <span class="step-number">3</span>
+                <h3>创建数据库表</h3>
+                <p>在 Supabase SQL 编辑器中执行以下脚本创建数据表。</p>
+
+                <div class="warning">
+                    <strong>📍 操作步骤：</strong><br>
+                    1. 在 Supabase 项目中，点击左侧菜单的 "SQL Editor"<br>
+                    2. 点击 "New query" 创建新查询<br>
+                    3. 复制下面的 SQL 代码并粘贴<br>
+                    4. 点击 "Run" 执行脚本
+                </div>
+
+                <div class="code-block" id="sqlCode">
+                    <button class="btn" onclick="copySql()" style="float: right; margin: -10px -10px 10px 10px;">📋 复制 SQL</button>
+                    <div style="clear: both;"></div>
+                    正在生成 SQL 代码...
+                </div>
+
+                <div class="links">
+                    <a href="supabase-setup.sql" target="_blank" class="link">📄 下载完整 SQL 文件</a>
+                </div>
+
+                <button class="btn" onclick="nextStep(4)">SQL 已执行，下一步 →</button>
+                <button class="btn btn-secondary" onclick="prevStep(2)">← 上一步</button>
+            </div>
+
+            <!-- 步骤 4: 生成配置文件 -->
+            <div class="step hidden" id="step4">
+                <span class="step-number">4</span>
+                <h3>生成配置文件</h3>
+                <p>根据您的配置信息生成 config.js 文件内容。</p>
+
+                <div class="code-block" id="configCode">
+                    正在生成配置代码...
+                </div>
+
+                <button class="btn" onclick="copyConfig()">📋 复制配置代码</button>
+                <button class="btn" onclick="downloadConfig()">💾 下载 config.js</button>
+                <button class="btn btn-secondary" onclick="prevStep(3)">← 上一步</button>
+            </div>
+
+            <!-- 步骤 5: 完成配置 -->
+            <div class="step hidden" id="step5">
+                <span class="step-number">5</span>
+                <h3>🎉 配置完成！</h3>
+                <p>恭喜！您已成功配置 Supabase 数据库。</p>
+
+                <div class="success">
+                    <strong>✅ 配置完成清单：</strong><br>
+                    • Supabase 项目已创建<br>
+                    • 数据库表已创建<br>
+                    • config.js 文件已更新<br>
+                    • 准备开始测试功能
+                </div>
+
+                <div class="warning">
+                    <strong>🧪 测试步骤：</strong><br>
+                    1. 将生成的配置代码保存到 js/config.js 文件<br>
+                    2. 启动本地服务器：python -m http.server 8086<br>
+                    3. 打开游戏：http://localhost:8086<br>
+                    4. 完成一局游戏并提交反馈<br>
+                    5. 在 Supabase Table Editor 中查看数据
+                </div>
+
+                <div class="links">
+                    <a href="index.html" class="link">🎮 打开游戏</a>
+                    <a href="setup-supabase.md" target="_blank" class="link">📖 查看详细文档</a>
+                </div>
+
+                <button class="btn" onclick="location.reload()">🔄 重新配置</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let config = {
+            url: '',
+            anonKey: ''
+        };
+
+        function updateProgress() {
+            const progress = (currentStep - 1) * 25;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function showStep(step) {
+            // 隐藏所有步骤
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById('step' + i).classList.add('hidden');
+            }
+            // 显示当前步骤
+            document.getElementById('step' + step).classList.remove('hidden');
+            currentStep = step;
+            updateProgress();
+        }
+
+        function nextStep(step) {
+            showStep(step);
+        }
+
+        function prevStep(step) {
+            showStep(step);
+        }
+
+        function validateConfig() {
+            const url = document.getElementById('projectUrl').value.trim();
+            const key = document.getElementById('anonKey').value.trim();
+
+            if (!url || !key) {
+                alert('请填写完整的 URL 和 API 密钥');
+                return;
+            }
+
+            if (!url.includes('supabase.co')) {
+                alert('URL 格式不正确，应该类似：https://xxxxx.supabase.co');
+                return;
+            }
+
+            if (!key.startsWith('eyJ')) {
+                alert('API 密钥格式不正确，应该以 "eyJ" 开头');
+                return;
+            }
+
+            config.url = url;
+            config.anonKey = key;
+
+            // 生成 SQL 代码
+            generateSqlCode();
+            nextStep(3);
+        }
+
+        function generateSqlCode() {
+            const sqlCode = `-- 创建游戏反馈表
+CREATE TABLE IF NOT EXISTS game_feedback (
+    id BIGSERIAL PRIMARY KEY,
+    user_name VARCHAR(100) DEFAULT '游客',
+    user_contact VARCHAR(255),
+    user_feedback TEXT,
+    score INTEGER DEFAULT 0,
+    accuracy DECIMAL(5,2) DEFAULT 0.00,
+    play_time INTEGER DEFAULT 0,
+    current_level INTEGER DEFAULT 1,
+    max_levels INTEGER DEFAULT 5,
+    correct_answers INTEGER DEFAULT 0,
+    total_answers INTEGER DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    user_agent TEXT,
+    screen_resolution VARCHAR(50),
+    CONSTRAINT valid_accuracy CHECK (accuracy >= 0 AND accuracy <= 100),
+    CONSTRAINT valid_level CHECK (current_level > 0 AND current_level <= max_levels)
+);
+
+-- 创建索引
+CREATE INDEX IF NOT EXISTS idx_game_feedback_created_at ON game_feedback(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_game_feedback_score ON game_feedback(score DESC);
+
+-- 启用行级安全性
+ALTER TABLE game_feedback ENABLE ROW LEVEL SECURITY;
+
+-- 创建策略
+CREATE POLICY "允许匿名用户提交反馈" ON game_feedback
+    FOR INSERT TO anon WITH CHECK (true);
+
+CREATE POLICY "允许查看反馈统计" ON game_feedback
+    FOR SELECT TO anon USING (true);
+
+-- 插入测试数据
+INSERT INTO game_feedback (user_name, user_feedback, score, accuracy, play_time, current_level, correct_answers, total_answers)
+VALUES ('测试用户', '配置测试成功！', 85, 85.00, 120, 3, 17, 20);`;
+
+            document.getElementById('sqlCode').innerHTML = 
+                '<button class="btn" onclick="copySql()" style="float: right; margin: -10px -10px 10px 10px;">📋 复制 SQL</button>' +
+                '<div style="clear: both;"></div>' +
+                '<pre>' + sqlCode + '</pre>';
+        }
+
+        function copySql() {
+            const sqlText = document.querySelector('#sqlCode pre').textContent;
+            navigator.clipboard.writeText(sqlText).then(() => {
+                alert('SQL 代码已复制到剪贴板！');
+            });
+        }
+
+        function generateConfigCode() {
+            const configCode = `// Supabase配置
+const SUPABASE_CONFIG = {
+    // 项目 URL
+    url: '${config.url}',
+    
+    // 匿名密钥
+    anonKey: '${config.anonKey}',
+    
+    // 反馈表名
+    feedbackTable: 'game_feedback'
+};
+
+// 导出配置
+window.SUPABASE_CONFIG = SUPABASE_CONFIG;`;
+
+            document.getElementById('configCode').innerHTML = '<pre>' + configCode + '</pre>';
+        }
+
+        function copyConfig() {
+            const configText = document.querySelector('#configCode pre').textContent;
+            navigator.clipboard.writeText(configText).then(() => {
+                alert('配置代码已复制到剪贴板！\n请将其保存到 js/config.js 文件中。');
+            });
+        }
+
+        function downloadConfig() {
+            const configText = document.querySelector('#configCode pre').textContent;
+            const blob = new Blob([configText], { type: 'text/javascript' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'config.js';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // 监听步骤3到步骤4的转换
+        document.addEventListener('DOMContentLoaded', function() {
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.target.id === 'step4' && !mutation.target.classList.contains('hidden')) {
+                        generateConfigCode();
+                        setTimeout(() => nextStep(5), 1000);
+                    }
+                });
+            });
+
+            observer.observe(document.getElementById('step4'), {
+                attributes: true,
+                attributeFilter: ['class']
+            });
+        });
+
+        // 初始化
+        updateProgress();
+    </script>
+</body>
+</html>

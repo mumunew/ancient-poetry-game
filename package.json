@@ -1,0 +1,41 @@
+{
+  "name": "supabase-auto-setup",
+  "version": "1.0.0",
+  "description": "古诗词游戏 Supabase 自动配置工具",
+  "main": "setup-cli.js",
+  "bin": {
+    "supabase-setup": "./setup-cli.js"
+  },
+  "scripts": {
+    "setup": "node setup-cli.js",
+    "setup:auto": "node setup-cli.js --auto",
+    "setup:interactive": "node setup-cli.js --interactive",
+    "setup:config-only": "node setup-cli.js --config-only",
+    "setup:sql-only": "node setup-cli.js --sql-only",
+    "serve": "python -m http.server 8086",
+    "start": "python -m http.server 8086"
+  },
+  "keywords": [
+    "supabase",
+    "database",
+    "setup",
+    "configuration",
+    "古诗词",
+    "游戏"
+  ],
+  "author": "AI Assistant",
+  "license": "MIT",
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/poetry-game.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/poetry-game/issues"
+  },
+  "homepage": "https://github.com/your-username/poetry-game#readme",
+  "devDependencies": {},
+  "dependencies": {}
+}

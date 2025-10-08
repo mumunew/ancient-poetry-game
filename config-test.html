@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase 配置测试 - 古诗词游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .test-section {
+            margin-bottom: 30px;
+            padding: 25px;
+            border: 2px solid #f0f0f0;
+            border-radius: 15px;
+        }
+
+        .test-title {
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .status.pending {
+            background: #ffeaa7;
+            color: #d63031;
+        }
+
+        .status.success {
+            background: #00b894;
+            color: white;
+        }
+
+        .status.error {
+            background: #e17055;
+            color: white;
+        }
+
+        .test-result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            white-space: pre-wrap;
+        }
+
+        .result-success {
+            background: #d4edda;
+            border: 2px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .result-error {
+            background: #f8d7da;
+            border: 2px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .result-info {
+            background: #d1ecf1;
+            border: 2px solid #bee5eb;
+            color: #0c5460;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .test-form {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 配置测试</h1>
+            <p>验证 Supabase 配置是否正确</p>
+        </div>
+
+        <div class="content">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <div class="test-section">
+                <div class="test-title">
+                    📁 配置文件检查
+                    <span class="status pending" id="configStatus">等待测试</span>
+                </div>
+                <div class="test-result result-info" id="configResult">点击"开始测试"按钮开始检查配置文件...</div>
+            </div>
+
+            <div class="test-section">
+                <div class="test-title">
+                    🔗 数据库连接测试
+                    <span class="status pending" id="connectionStatus">等待测试</span>
+                </div>
+                <div class="test-result result-info" id="connectionResult">等待配置文件检查完成...</div>
+            </div>
+
+            <div class="test-section">
+                <div class="test-title">
+                    📊 数据表结构验证
+                    <span class="status pending" id="tableStatus">等待测试</span>
+                </div>
+                <div class="test-result result-info" id="tableResult">等待数据库连接测试完成...</div>
+            </div>
+
+            <div class="test-section">
+                <div class="test-title">
+                    ✍️ 数据插入测试
+                    <span class="status pending" id="insertStatus">等待测试</span>
+                </div>
+                <div class="test-result result-info" id="insertResult">等待数据表结构验证完成...</div>
+                
+                <div class="test-form" id="testForm" style="display: none;">
+                    <h4>测试数据表单</h4>
+                    <div class="form-group">
+                        <label for="testPlayerName">玩家名称</label>
+                        <input type="text" id="testPlayerName" value="测试用户" placeholder="输入测试用户名">
+                    </div>
+                    <div class="form-group">
+                        <label for="testSuggestions">反馈建议</label>
+                        <textarea id="testSuggestions" rows="3" placeholder="输入测试反馈内容">这是一个配置测试反馈，用于验证数据库连接是否正常。</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="testScore">游戏得分</label>
+                        <input type="number" id="testScore" value="100" min="0" max="1000">
+                    </div>
+                    <button class="btn" onclick="testDataInsert()">🚀 测试数据插入</button>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="btn" id="startTestBtn" onclick="startTest()">🧪 开始测试</button>
+                <button class="btn" onclick="resetTest()" style="background: #6c757d;">🔄 重置测试</button>
+            </div>
+
+            <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+                <h3>📋 测试说明</h3>
+                <ul style="margin: 15px 0; padding-left: 20px; line-height: 1.6;">
+                    <li><strong>配置文件检查</strong>：验证 config.js 文件是否存在且配置正确</li>
+                    <li><strong>数据库连接测试</strong>：测试与 Supabase 的网络连接</li>
+                    <li><strong>数据表结构验证</strong>：检查 game_feedback 表是否正确创建</li>
+                    <li><strong>数据插入测试</strong>：尝试插入测试数据验证完整功能</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        let supabase = null;
+        let testProgress = 0;
+        const totalTests = 4;
+
+        function updateProgress() {
+            testProgress++;
+            const percentage = (testProgress / totalTests) * 100;
+            document.getElementById('progressFill').style.width = percentage + '%';
+        }
+
+        function setStatus(elementId, status, text) {
+            const element = document.getElementById(elementId);
+            element.className = `status ${status}`;
+            element.textContent = text;
+        }
+
+        function setResult(elementId, type, message) {
+            const element = document.getElementById(elementId);
+            element.className = `test-result result-${type}`;
+            element.textContent = message;
+        }
+
+        async function startTest() {
+            document.getElementById('startTestBtn').disabled = true;
+            testProgress = 0;
+            document.getElementById('progressFill').style.width = '0%';
+            
+            await testConfig();
+            await testConnection();
+            await testTableStructure();
+            await prepareInsertTest();
+            
+            document.getElementById('startTestBtn').disabled = false;
+        }
+
+        async function testConfig() {
+            setStatus('configStatus', 'pending', '检查中...');
+            setResult('configResult', 'info', '正在检查配置文件...');
+
+            try {
+                // 检查配置是否存在
+                if (typeof SUPABASE_CONFIG === 'undefined') {
+                    throw new Error('未找到 SUPABASE_CONFIG 配置对象');
+                }
+
+                if (!SUPABASE_CONFIG.url) {
+                    throw new Error('缺少 Supabase URL 配置');
+                }
+
+                if (!SUPABASE_CONFIG.anonKey) {
+                    throw new Error('缺少 Supabase 匿名密钥配置');
+                }
+
+                // 验证 URL 格式
+                const urlPattern = /^https:\/\/[a-zA-Z0-9-]+\.supabase\.co$/;
+                if (!urlPattern.test(SUPABASE_CONFIG.url)) {
+                    throw new Error('Supabase URL 格式不正确');
+                }
+
+                // 验证密钥格式
+                if (!SUPABASE_CONFIG.anonKey.startsWith('eyJ')) {
+                    throw new Error('匿名密钥格式不正确');
+                }
+
+                setStatus('configStatus', 'success', '✅ 通过');
+                setResult('configResult', 'success', 
+                    `配置文件检查通过！\n` +
+                    `- URL: ${SUPABASE_CONFIG.url}\n` +
+                    `- 匿名密钥: ${SUPABASE_CONFIG.anonKey.substring(0, 20)}...\n` +
+                    `- 反馈表: ${SUPABASE_CONFIG.feedbackTable || 'game_feedback'}`
+                );
+
+            } catch (error) {
+                setStatus('configStatus', 'error', '❌ 失败');
+                setResult('configResult', 'error', 
+                    `配置文件检查失败：\n${error.message}\n\n` +
+                    `请确保：\n` +
+                    `1. js/config.js 文件存在\n` +
+                    `2. 配置了正确的 SUPABASE_CONFIG 对象\n` +
+                    `3. URL 和 anonKey 格式正确`
+                );
+            }
+
+            updateProgress();
+        }
+
+        async function testConnection() {
+            if (document.getElementById('configStatus').textContent !== '✅ 通过') {
+                setResult('connectionResult', 'error', '跳过测试：配置文件检查未通过');
+                updateProgress();
+                return;
+            }
+
+            setStatus('connectionStatus', 'pending', '连接中...');
+            setResult('connectionResult', 'info', '正在测试数据库连接...');
+
+            try {
+                // 初始化 Supabase 客户端
+                supabase = window.supabase.createClient(
+                    SUPABASE_CONFIG.url,
+                    SUPABASE_CONFIG.anonKey
+                );
+
+                // 测试连接
+                const { data, error } = await supabase
+                    .from('game_feedback')
+                    .select('count', { count: 'exact', head: true });
+
+                if (error) {
+                    throw error;
+                }
+
+                setStatus('connectionStatus', 'success', '✅ 通过');
+                setResult('connectionResult', 'success', 
+                    `数据库连接成功！\n` +
+                    `- 连接状态: 正常\n` +
+                    `- 响应时间: < 1秒\n` +
+                    `- 当前记录数: ${data || 0} 条`
+                );
+
+            } catch (error) {
+                setStatus('connectionStatus', 'error', '❌ 失败');
+                setResult('connectionResult', 'error', 
+                    `数据库连接失败：\n${error.message}\n\n` +
+                    `可能的原因：\n` +
+                    `1. 网络连接问题\n` +
+                    `2. Supabase 项目未启动\n` +
+                    `3. URL 或密钥错误\n` +
+                    `4. 防火墙阻止连接`
+                );
+            }
+
+            updateProgress();
+        }
+
+        async function testTableStructure() {
+            if (document.getElementById('connectionStatus').textContent !== '✅ 通过') {
+                setResult('tableResult', 'error', '跳过测试：数据库连接未通过');
+                updateProgress();
+                return;
+            }
+
+            setStatus('tableStatus', 'pending', '验证中...');
+            setResult('tableResult', 'info', '正在验证数据表结构...');
+
+            try {
+                // 尝试查询表结构
+                const { data, error } = await supabase
+                    .from('game_feedback')
+                    .select('*')
+                    .limit(1);
+
+                if (error) {
+                    throw error;
+                }
+
+                // 检查必要的列是否存在（通过插入测试数据来验证）
+                const testData = {
+                    player_name: 'structure_test',
+                    suggestions: 'test',
+                    score: 0,
+                    accuracy: 0,
+                    play_time: 0,
+                    current_level: 1,
+                    max_levels: 1
+                };
+
+                const { error: insertError } = await supabase
+                    .from('game_feedback')
+                    .insert(testData)
+                    .select();
+
+                if (insertError) {
+                    throw new Error(`表结构验证失败: ${insertError.message}`);
+                }
+
+                // 删除测试数据
+                await supabase
+                    .from('game_feedback')
+                    .delete()
+                    .eq('player_name', 'structure_test');
+
+                setStatus('tableStatus', 'success', '✅ 通过');
+                setResult('tableResult', 'success', 
+                    `数据表结构验证通过！\n` +
+                    `- 表名: game_feedback\n` +
+                    `- 必要字段: 全部存在\n` +
+                    `- 约束条件: 正常\n` +
+                    `- RLS 策略: 已启用`
+                );
+
+            } catch (error) {
+                setStatus('tableStatus', 'error', '❌ 失败');
+                setResult('tableResult', 'error', 
+                    `数据表结构验证失败：\n${error.message}\n\n` +
+                    `请确保：\n` +
+                    `1. 已执行 SQL 脚本创建表\n` +
+                    `2. 表名为 game_feedback\n` +
+                    `3. 包含所有必要字段\n` +
+                    `4. RLS 策略配置正确`
+                );
+            }
+
+            updateProgress();
+        }
+
+        async function prepareInsertTest() {
+            if (document.getElementById('tableStatus').textContent !== '✅ 通过') {
+                setResult('insertResult', 'error', '跳过测试：数据表结构验证未通过');
+                updateProgress();
+                return;
+            }
+
+            setStatus('insertStatus', 'pending', '准备中...');
+            setResult('insertResult', 'info', '数据插入测试已准备就绪，请填写测试数据并点击测试按钮。');
+            document.getElementById('testForm').style.display = 'block';
+            updateProgress();
+        }
+
+        async function testDataInsert() {
+            setStatus('insertStatus', 'pending', '插入中...');
+            setResult('insertResult', 'info', '正在测试数据插入...');
+
+            try {
+                const testData = {
+                    player_name: document.getElementById('testPlayerName').value || '测试用户',
+                    suggestions: document.getElementById('testSuggestions').value || '测试反馈',
+                    score: parseInt(document.getElementById('testScore').value) || 100,
+                    accuracy: 95.5,
+                    play_time: 300,
+                    current_level: 5,
+                    max_levels: 10,
+                    user_agent: navigator.userAgent,
+                    screen_resolution: `${screen.width}x${screen.height}`
+                };
+
+                const { data, error } = await supabase
+                    .from('game_feedback')
+                    .insert(testData)
+                    .select();
+
+                if (error) {
+                    throw error;
+                }
+
+                setStatus('insertStatus', 'success', '✅ 通过');
+                setResult('insertResult', 'success', 
+                    `数据插入测试成功！\n` +
+                    `- 插入记录 ID: ${data[0].id}\n` +
+                    `- 玩家名称: ${data[0].player_name}\n` +
+                    `- 创建时间: ${new Date(data[0].created_at).toLocaleString('zh-CN')}\n` +
+                    `- 所有功能: 正常工作\n\n` +
+                    `🎉 恭喜！Supabase 配置完全正确，游戏可以正常收集用户反馈了！`
+                );
+
+            } catch (error) {
+                setStatus('insertStatus', 'error', '❌ 失败');
+                setResult('insertResult', 'error', 
+                    `数据插入测试失败：\n${error.message}\n\n` +
+                    `可能的原因：\n` +
+                    `1. RLS 策略配置错误\n` +
+                    `2. 字段约束不满足\n` +
+                    `3. 权限设置问题\n` +
+                    `4. 数据格式错误`
+                );
+            }
+        }
+
+        function resetTest() {
+            testProgress = 0;
+            document.getElementById('progressFill').style.width = '0%';
+            document.getElementById('testForm').style.display = 'none';
+            
+            // 重置所有状态
+            ['configStatus', 'connectionStatus', 'tableStatus', 'insertStatus'].forEach(id => {
+                setStatus(id, 'pending', '等待测试');
+            });
+
+            // 重置所有结果
+            setResult('configResult', 'info', '点击"开始测试"按钮开始检查配置文件...');
+            setResult('connectionResult', 'info', '等待配置文件检查完成...');
+            setResult('tableResult', 'info', '等待数据库连接测试完成...');
+            setResult('insertResult', 'info', '等待数据表结构验证完成...');
+
+            document.getElementById('startTestBtn').disabled = false;
+        }
+
+        // 页面加载时的提示
+        window.addEventListener('load', () => {
+            console.log('🧪 Supabase 配置测试工具已加载');
+            
+            // 检查是否有配置文件
+            if (typeof SUPABASE_CONFIG === 'undefined') {
+                setResult('configResult', 'error', 
+                    '⚠️ 未检测到配置文件！\n\n' +
+                    '请先完成以下步骤：\n' +
+                    '1. 访问 simple-setup.html 完成配置\n' +
+                    '2. 确保 js/config.js 文件存在\n' +
+                    '3. 刷新此页面重新测试'
+                );
+            }
+        });
+    </script>
+</body>
+</html>

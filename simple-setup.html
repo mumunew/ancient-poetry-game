@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase 简易配置 - 古诗词游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .step {
+            margin-bottom: 40px;
+            padding: 30px;
+            border: 2px solid #f0f0f0;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .step:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+
+        .step-title {
+            font-size: 1.4em;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .step-content {
+            margin-left: 55px;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .code-block {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+
+        .copy-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-top: 10px;
+            transition: background 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #218838;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border: 2px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            color: #856404;
+        }
+
+        .success {
+            background: #d4edda;
+            border: 2px solid #c3e6cb;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            color: #155724;
+        }
+
+        .info {
+            background: #d1ecf1;
+            border: 2px solid #bee5eb;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            color: #0c5460;
+        }
+
+        .input-group {
+            margin: 15px 0;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .config-generator {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+
+        .generated-config {
+            background: #2d3748;
+            color: #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .step {
+                padding: 20px;
+            }
+
+            .step-content {
+                margin-left: 0;
+                margin-top: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛠️ Supabase 简易配置</h1>
+            <p>避免 CORS 错误的手动配置方案</p>
+        </div>
+
+        <div class="content">
+            <div class="warning">
+                <h3>⚠️ 关于 CORS 错误</h3>
+                <p>由于浏览器安全限制，无法直接从网页访问 Supabase Management API。我们提供以下手动配置方案，同样简单有效！</p>
+            </div>
+
+            <div class="step">
+                <div class="step-title">
+                    <span class="step-number">1</span>
+                    创建 Supabase 项目
+                </div>
+                <div class="step-content">
+                    <p>1. 访问 <a href="https://supabase.com" target="_blank">Supabase 官网</a> 并登录</p>
+                    <p>2. 点击 "New Project" 创建新项目</p>
+                    <p>3. 填写项目名称（如：poetry-game）</p>
+                    <p>4. 选择数据库密码并记住它</p>
+                    <p>5. 选择地区（推荐：Singapore 或 Tokyo）</p>
+                    <p>6. 等待项目创建完成（约2-3分钟）</p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-title">
+                    <span class="step-number">2</span>
+                    执行 SQL 脚本
+                </div>
+                <div class="step-content">
+                    <p>1. 在项目控制台中，点击左侧菜单的 "SQL Editor"</p>
+                    <p>2. 复制下面的 SQL 脚本并粘贴到编辑器中</p>
+                    <p>3. 点击 "Run" 执行脚本</p>
+                    
+                    <div class="code-block" id="sqlScript">-- 创建游戏反馈表
+CREATE TABLE IF NOT EXISTS game_feedback (
+    id BIGSERIAL PRIMARY KEY,
+    player_name VARCHAR(100),
+    contact_info VARCHAR(255),
+    suggestions TEXT,
+    score INTEGER DEFAULT 0 CHECK (score >= 0),
+    accuracy DECIMAL(5,2) DEFAULT 0.00 CHECK (accuracy >= 0 AND accuracy <= 100),
+    play_time INTEGER DEFAULT 0 CHECK (play_time >= 0),
+    current_level INTEGER DEFAULT 1 CHECK (current_level >= 1),
+    max_levels INTEGER DEFAULT 1 CHECK (max_levels >= 1),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    user_agent TEXT,
+    screen_resolution VARCHAR(50),
+    
+    -- 约束条件
+    CONSTRAINT valid_level_progress CHECK (current_level <= max_levels),
+    CONSTRAINT valid_contact_or_suggestion CHECK (
+        contact_info IS NOT NULL OR suggestions IS NOT NULL
+    )
+);
+
+-- 添加表注释
+COMMENT ON TABLE game_feedback IS '古诗词游戏用户反馈数据表';
+
+-- 启用行级安全
+ALTER TABLE game_feedback ENABLE ROW LEVEL SECURITY;
+
+-- 允许匿名用户插入反馈
+CREATE POLICY "Allow anonymous insert" ON game_feedback
+    FOR INSERT TO anon
+    WITH CHECK (true);
+
+-- 允许读取反馈
+CREATE POLICY "Allow read feedback" ON game_feedback
+    FOR SELECT TO anon
+    USING (true);
+
+-- 创建性能索引
+CREATE INDEX IF NOT EXISTS idx_game_feedback_created_at 
+    ON game_feedback(created_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_game_feedback_score 
+    ON game_feedback(score DESC);
+
+-- 创建统计视图
+CREATE OR REPLACE VIEW feedback_stats AS
+SELECT 
+    COUNT(*) as total_feedback,
+    AVG(score) as avg_score,
+    MAX(score) as max_score,
+    AVG(accuracy) as avg_accuracy,
+    AVG(play_time) as avg_play_time
+FROM game_feedback;</div>
+                    <button class="copy-btn" onclick="copyText('sqlScript')">📋 复制 SQL 脚本</button>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-title">
+                    <span class="step-number">3</span>
+                    获取 API 密钥
+                </div>
+                <div class="step-content">
+                    <p>1. 在项目控制台中，点击左侧菜单的 "Settings"</p>
+                    <p>2. 选择 "API" 选项卡</p>
+                    <p>3. 复制以下信息：</p>
+                    <ul style="margin: 15px 0; padding-left: 20px;">
+                        <li><strong>Project URL</strong>：项目的 API 地址</li>
+                        <li><strong>anon public</strong>：匿名访问密钥</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-title">
+                    <span class="step-number">4</span>
+                    生成配置文件
+                </div>
+                <div class="step-content">
+                    <div class="config-generator">
+                        <h3>🔧 配置文件生成器</h3>
+                        <p>填写从 Supabase 获取的信息，自动生成配置代码：</p>
+                        
+                        <div class="input-group">
+                            <label for="projectUrl">Project URL</label>
+                            <input type="text" id="projectUrl" placeholder="https://your-project.supabase.co">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="anonKey">Anon Key</label>
+                            <input type="text" id="anonKey" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+                        </div>
+                        
+                        <button class="btn" onclick="generateConfig()">🚀 生成配置文件</button>
+                        
+                        <div id="configOutput" style="display: none;">
+                            <h4>生成的配置代码：</h4>
+                            <div class="generated-config" id="generatedConfig"></div>
+                            <button class="copy-btn" onclick="copyText('generatedConfig')">📋 复制配置代码</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-title">
+                    <span class="step-number">5</span>
+                    更新配置文件
+                </div>
+                <div class="step-content">
+                    <p>1. 打开项目中的 <code>js/config.js</code> 文件</p>
+                    <p>2. 将上面生成的配置代码替换原有内容</p>
+                    <p>3. 保存文件</p>
+                    
+                    <div class="success">
+                        <h4>✅ 配置完成！</h4>
+                        <p>现在您的古诗词游戏已经成功连接到 Supabase 数据库，可以收集用户反馈了！</p>
+                        <p style="margin-top: 10px;">
+                            <a href="config-test.html" style="background: linear-gradient(45deg, #17a2b8, #6f42c1); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none;">🧪 测试配置</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-title">
+                    <span class="step-number">6</span>
+                    测试配置
+                </div>
+                <div class="step-content">
+                    <p>1. 打开游戏页面：<a href="index.html" target="_blank">index.html</a></p>
+                    <p>2. 玩几关游戏</p>
+                    <p>3. 点击"提交反馈"按钮</p>
+                    <p>4. 填写反馈信息并提交</p>
+                    <p>5. 在 Supabase 控制台的 "Table Editor" 中查看 game_feedback 表，确认数据已成功插入</p>
+                    
+                    <div class="info">
+                        <h4>🔍 验证方法</h4>
+                        <p>在浏览器开发者工具的控制台中，应该能看到 "✅ 反馈提交成功" 的消息，而不是错误信息。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="warning">
+                <h3>💡 常见问题</h3>
+                <ul style="margin: 15px 0; padding-left: 20px;">
+                    <li><strong>403 错误</strong>：检查 RLS 策略是否正确设置</li>
+                    <li><strong>连接失败</strong>：确认 Project URL 和 Anon Key 是否正确</li>
+                    <li><strong>数据未插入</strong>：检查表结构是否正确创建</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function copyText(elementId) {
+            const element = document.getElementById(elementId);
+            const textArea = document.createElement('textarea');
+            textArea.value = element.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            // 显示复制成功提示
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = '✅ 已复制！';
+            btn.style.background = '#28a745';
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = '#28a745';
+            }, 2000);
+        }
+
+        function generateConfig() {
+            const projectUrl = document.getElementById('projectUrl').value.trim();
+            const anonKey = document.getElementById('anonKey').value.trim();
+            
+            if (!projectUrl || !anonKey) {
+                alert('请填写完整的 Project URL 和 Anon Key');
+                return;
+            }
+            
+            const config = `// Supabase 配置文件
+// 生成时间: ${new Date().toLocaleString('zh-CN')}
+
+const SUPABASE_CONFIG = {
+    url: '${projectUrl}',
+    anonKey: '${anonKey}',
+    feedbackTable: 'game_feedback'
+};
+
+// 配置验证
+if (typeof window !== 'undefined') {
+    console.log('✅ Supabase 配置已加载');
+    console.log('📊 项目URL:', SUPABASE_CONFIG.url);
+    console.log('🔑 匿名密钥已设置');
+}
+
+// 导出配置（支持多种模块系统）
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = SUPABASE_CONFIG;
+} else if (typeof window !== 'undefined') {
+    window.SUPABASE_CONFIG = SUPABASE_CONFIG;
+}`;
+            
+            document.getElementById('generatedConfig').textContent = config;
+            document.getElementById('configOutput').style.display = 'block';
+            
+            // 滚动到生成的配置
+            document.getElementById('configOutput').scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'center' 
+            });
+        }
+
+        // 页面加载时的提示
+        window.addEventListener('load', () => {
+            console.log('🌟 Supabase 简易配置工具已加载');
+            console.log('📝 请按照步骤完成配置');
+        });
+    </script>
+</body>
+</html>

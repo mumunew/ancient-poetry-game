@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>故障排除 - Supabase 配置</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .problem-section {
+            margin-bottom: 40px;
+            border: 2px solid #f0f0f0;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .problem-header {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+        }
+
+        .problem-header:hover {
+            background: linear-gradient(45deg, #c0392b, #a93226);
+        }
+
+        .problem-header h3 {
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+        }
+
+        .problem-icon {
+            font-size: 1.5em;
+            margin-right: 15px;
+        }
+
+        .expand-icon {
+            font-size: 1.2em;
+            transition: transform 0.3s ease;
+        }
+
+        .problem-content {
+            padding: 30px;
+            display: none;
+            background: #f8f9fa;
+        }
+
+        .problem-content.active {
+            display: block;
+        }
+
+        .solution-step {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            border-left: 4px solid #28a745;
+        }
+
+        .solution-step h4 {
+            color: #28a745;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .code-example {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            margin: 10px 0;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border: 2px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            color: #856404;
+        }
+
+        .info-box {
+            background: #d1ecf1;
+            border: 2px solid #bee5eb;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            color: #0c5460;
+        }
+
+        .success-box {
+            background: #d4edda;
+            border: 2px solid #c3e6cb;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            color: #155724;
+        }
+
+        .quick-links {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+
+        .quick-links h3 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .link-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .quick-link {
+            display: block;
+            padding: 15px 20px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .quick-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .search-box {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1.1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .problem-content {
+                padding: 20px;
+            }
+
+            .link-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 故障排除</h1>
+            <p>解决 Supabase 配置中的常见问题</p>
+        </div>
+
+        <div class="content">
+            <div class="search-box">
+                <input type="text" class="search-input" id="searchInput" placeholder="🔍 搜索问题关键词..." onkeyup="searchProblems()">
+            </div>
+
+            <div class="problem-section" data-keywords="cors 跨域 访问 被阻止 policy">
+                <div class="problem-header" onclick="toggleProblem(this)">
+                    <h3><span class="problem-icon">🚫</span>CORS 跨域访问被阻止</h3>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="problem-content">
+                    <div class="warning-box">
+                        <strong>错误信息：</strong> "Access to fetch at 'https://api.supabase.com/...' from origin 'http://localhost:8086' has been blocked by CORS policy"
+                    </div>
+                    
+                    <div class="solution-step">
+                        <h4>解决方案 1：使用简化配置方案</h4>
+                        <p>我们已经为您准备了避免 CORS 问题的简化配置方案：</p>
+                        <p><a href="simple-setup.html" style="color: #007bff;">👉 访问简化配置页面</a></p>
+                    </div>
+
+                    <div class="solution-step">
+                        <h4>解决方案 2：使用 HTTPS 服务器</h4>
+                        <p>如果必须使用自动化配置，请使用 HTTPS 服务器：</p>
+                        <div class="code-example">npm install -g http-server
+http-server -S -C cert.pem -K key.pem</div>
+                    </div>
+
+                    <div class="info-box">
+                        <strong>为什么会出现 CORS 错误？</strong><br>
+                        浏览器的同源策略阻止了从 HTTP 页面访问 HTTPS API。Supabase Management API 只能通过 HTTPS 访问。
+                    </div>
+                </div>
+            </div>
+
+            <div class="problem-section" data-keywords="配置 文件 未找到 config undefined">
+                <div class="problem-header" onclick="toggleProblem(this)">
+                    <h3><span class="problem-icon">📁</span>配置文件未找到或未加载</h3>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="problem-content">
+                    <div class="warning-box">
+                        <strong>错误信息：</strong> "SUPABASE_CONFIG is not defined" 或 "Cannot read property 'url' of undefined"
+                    </div>
+                    
+                    <div class="solution-step">
+                        <h4>检查配置文件是否存在</h4>
+                        <p>确保 <code>js/config.js</code> 文件存在且内容正确：</p>
+                        <div class="code-example">const SUPABASE_CONFIG = {
+    url: 'https://your-project.supabase.co',
+    anonKey: 'your-anon-key-here',
+    feedbackTable: 'game_feedback'
+};</div>
+                    </div>
+
+                    <div class="solution-step">
+                        <h4>检查文件引用</h4>
+                        <p>确保在 HTML 文件中正确引用了配置文件：</p>
+                        <div class="code-example">&lt;script src="js/config.js"&gt;&lt;/script&gt;</div>
+                    </div>
+
+                    <div class="solution-step">
+                        <h4>使用配置生成器</h4>
+                        <p>使用我们的配置生成器自动创建正确的配置文件：</p>
+                        <p><a href="simple-setup.html#configGenerator" style="color: #007bff;">👉 使用配置生成器</a></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="problem-section" data-keywords="连接 失败 网络 超时 timeout">
+                <div class="problem-header" onclick="toggleProblem(this)">
+                    <h3><span class="problem-icon">🌐</span>数据库连接失败</h3>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="problem-content">
+                    <div class="warning-box">
+                        <strong>错误信息：</strong> "Failed to fetch" 或 "Network request failed" 或连接超时
+                    </div>
+                    
+                    <div class="solution-step">
+                        <h4>检查项目状态</h4>
+                        <p>1. 登录 Supabase 控制台</p>
+                        <p>2. 确认项目状态为 "Active"（绿色）</p>
+                        <p>3. 如果项目处于 "Paused" 状态，点击 "Restore" 恢复</p>
+                    </div>
+
+                    <div class="solution-step">
+                        <h4>验证 URL 和密钥</h4>
+                        <p>确保使用正确的项目 URL 和匿名密钥：</p>
+                        <div class="code-example">// 正确的 URL 格式
+https://abcdefghijklmnop.supabase.co
+
+// 正确的密钥格式（以 eyJ 开头）
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...</div>
+                    </div>
+
+                    <div class="solution-step">
+                        <h4>检查网络连接</h4>
+                        <p>1. 确保网络连接正常</p>
+                        <p>2. 检查防火墙设置</p>
+                        <p>3. 尝试在浏览器中直接访问项目 URL</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="problem-section" data-keywords="表 不存在 table does not exist 404">
+                <div class="problem-header" onclick="toggleProblem(this)">
+                    <h3><span class="problem-icon">📊</span>数据表不存在</h3>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="problem-content">
+                    <div class="warning-box">
+                        <strong>错误信息：</strong> "relation 'public.game_feedback' does not exist" 或 404 错误
+                    </div>
+                    
+                    <div class="solution-step">
+                        <h4>执行 SQL 脚本</h4>
+                        <p>1. 在 Supabase 控制台中打开 "SQL Editor"</p>
+                        <p>2. 复制并执行我们提供的 SQL 脚本</p>
+                        <p><a href="simple-setup.html" style="color: #007bff;">👉 获取 SQL 脚本</a></p>
+                    </div>
+
+                    <div class="solution-step">
+                        <h4>验证表创建</h4>
+                        <p>在 SQL Editor 中运行以下查询验证表是否存在：</p>
+                        <div class="code-example">SELECT table_name 
+FROM information_schema.tables 
+WHERE table_schema = 'public' 
+AND table_name = 'game_feedback';</div>
+                    </div>
+
+                    <div class="solution-step">
+                        <h4>检查表权限</h4>
+                        <p>确保启用了 Row Level Security 并设置了正确的策略：</p>
+                        <div class="code-example">-- 检查 RLS 状态
+SELECT schemaname, tablename, rowsecurity 
+FROM pg_tables 
+WHERE tablename = 'game_feedback';
+
+-- 检查策略
+SELECT * FROM pg_policies WHERE tablename = 'game_feedback';</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="problem-section" data-keywords="权限 403 forbidden rls policy">
+                <div class="problem-header" onclick="toggleProblem(this)">
+                    <h3><span class="problem-icon">🔒</span>权限被拒绝 (403 错误)</h3>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="problem-content">
+                    <div class="warning-box">
+                        <strong>错误信息：</strong> "403 Forbidden" 或 "new row violates row-level security policy"
+                    </div>
+                    
+                    <div class="solution-step">
+                        <h4>检查 RLS 策略</h4>
+                        <p>确保为匿名用户设置了正确的策略：</p>
+                        <div class="code-example">-- 允许匿名用户插入数据
+CREATE POLICY "Allow anonymous insert" ON game_feedback
+    FOR INSERT TO anon
+    WITH CHECK (true);
+
+-- 允许匿名用户读取数据
+CREATE POLICY "Allow read feedback" ON game_feedback
+    FOR SELECT TO anon
+    USING (true);</div>
+                    </div>
+
+                    <div class="solution-step">
+                        <h4>重新创建策略</h4>
+                        <p>如果策略有问题，先删除再重新创建：</p>
+                        <div class="code-example">-- 删除现有策略
+DROP POLICY IF EXISTS "Allow anonymous insert" ON game_feedback;
+DROP POLICY IF EXISTS "Allow read feedback" ON game_feedback;
+
+-- 重新创建策略
+CREATE POLICY "Allow anonymous insert" ON game_feedback
+    FOR INSERT TO anon
+    WITH CHECK (true);
+
+CREATE POLICY "Allow read feedback" ON game_feedback
+    FOR SELECT TO anon
+    USING (true);</div>
+                    </div>
+
+                    <div class="solution-step">
+                        <h4>验证匿名密钥</h4>
+                        <p>确保使用的是 "anon public" 密钥，而不是 "service_role" 密钥。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="problem-section" data-keywords="数据 插入 失败 constraint 约束">
+                <div class="problem-header" onclick="toggleProblem(this)">
+                    <h3><span class="problem-icon">💾</span>数据插入失败</h3>
+                    <span class="expand-icon">▼</span>
+                </div>
+                <div class="problem-content">
+                    <div class="warning-box">
+                        <strong>错误信息：</strong> "violates check constraint" 或 "null value in column"
+                    </div>
+                    
+                    <div class="solution-step">
+                        <h4>检查必填字段</h4>
+                        <p>确保提供了必要的数据字段：</p>
+                        <div class="code-example">const feedbackData = {
+    player_name: '玩家名称',        // 可选
+    contact_info: '联系方式',      // 可选，但与 suggestions 至少一个不为空
+    suggestions: '反馈建议',       // 可选，但与 contact_info 至少一个不为空
+    score: 100,                   // 必须 >= 0
+    accuracy: 95.5,               // 必须在 0-100 之间
+    play_time: 300,               // 必须 >= 0
+    current_level: 5,             // 必须 >= 1
+    max_levels: 10                // 必须 >= 1，且 >= current_level
+};</div>
+                    </div>
+
+                    <div class="solution-step">
+                        <h4>验证数据格式</h4>
+                        <p>检查数据类型和约束条件：</p>
+                        <ul style="margin: 10px 0; padding-left: 20px;">
+                            <li>score: 整数，>= 0</li>
+                            <li>accuracy: 小数，0-100 之间</li>
+                            <li>play_time: 整数，>= 0</li>
+                            <li>current_level: 整数，>= 1</li>
+                            <li>max_levels: 整数，>= current_level</li>
+                        </ul>
+                    </div>
+
+                    <div class="solution-step">
+                        <h4>使用测试工具</h4>
+                        <p>使用我们的配置测试工具验证数据插入：</p>
+                        <p><a href="config-test.html" style="color: #007bff;">👉 打开配置测试工具</a></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quick-links">
+                <h3>🔗 快速链接</h3>
+                <div class="link-grid">
+                    <a href="simple-setup.html" class="quick-link">🛠️ 简化配置</a>
+                    <a href="config-test.html" class="quick-link">🧪 配置测试</a>
+                    <a href="auto-setup.html" class="quick-link">⚙️ 配置向导</a>
+                    <a href="setup-supabase.md" class="quick-link">📖 详细指南</a>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h4>💡 仍然遇到问题？</h4>
+                <p>如果以上解决方案都无法解决您的问题，请：</p>
+                <ol style="margin: 10px 0; padding-left: 20px;">
+                    <li>使用配置测试工具进行全面检查</li>
+                    <li>查看浏览器开发者工具的控制台错误信息</li>
+                    <li>确认 Supabase 项目状态正常</li>
+                    <li>重新按照简化配置步骤操作</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleProblem(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('.expand-icon');
+            
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
+                icon.textContent = '▼';
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                // 关闭其他打开的问题
+                document.querySelectorAll('.problem-content.active').forEach(el => {
+                    el.classList.remove('active');
+                    el.previousElementSibling.querySelector('.expand-icon').textContent = '▼';
+                    el.previousElementSibling.querySelector('.expand-icon').style.transform = 'rotate(0deg)';
+                });
+                
+                content.classList.add('active');
+                icon.textContent = '▲';
+                icon.style.transform = 'rotate(180deg)';
+            }
+        }
+
+        function searchProblems() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const problemSections = document.querySelectorAll('.problem-section');
+            
+            problemSections.forEach(section => {
+                const keywords = section.getAttribute('data-keywords').toLowerCase();
+                const title = section.querySelector('h3').textContent.toLowerCase();
+                
+                if (keywords.includes(searchTerm) || title.includes(searchTerm) || searchTerm === '') {
+                    section.style.display = 'block';
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+        }
+
+        // 页面加载时的提示
+        window.addEventListener('load', () => {
+            console.log('🔧 故障排除工具已加载');
+            console.log('💡 使用搜索功能快速找到解决方案');
+        });
+    </script>
+</body>
+</html>

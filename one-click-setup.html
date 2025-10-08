@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase 一键配置 - 古诗词游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .setup-section {
+            margin-bottom: 30px;
+            padding: 25px;
+            border: 2px solid #f0f0f0;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .setup-section:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-icon {
+            font-size: 1.5em;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .help-text {
+            font-size: 0.9em;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .progress-container {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #f0f0f0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .log-container {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 5px 0;
+        }
+
+        .log-success {
+            color: #28a745;
+        }
+
+        .log-error {
+            color: #dc3545;
+        }
+
+        .log-info {
+            color: #17a2b8;
+        }
+
+        .log-warning {
+            color: #ffc107;
+        }
+
+        .result-section {
+            margin-top: 30px;
+            padding: 25px;
+            border-radius: 15px;
+            display: none;
+        }
+
+        .result-success {
+            background: #d4edda;
+            border: 2px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .result-error {
+            background: #f8d7da;
+            border: 2px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .config-output {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .copy-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        .copy-btn:hover {
+            background: #218838;
+        }
+
+        .steps-guide {
+            background: #e7f3ff;
+            border: 2px solid #b3d9ff;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .steps-guide h3 {
+            color: #0066cc;
+            margin-bottom: 15px;
+        }
+
+        .steps-guide ol {
+            margin-left: 20px;
+        }
+
+        .steps-guide li {
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Supabase 一键配置</h1>
+            <p>为古诗词游戏自动配置 Supabase 数据库</p>
+        </div>
+
+        <div class="steps-guide">
+            <h3>📋 配置前准备</h3>
+            <ol>
+                <li>登录 <a href="https://supabase.com" target="_blank">Supabase 官网</a></li>
+                <li>创建新项目或选择现有项目</li>
+                <li>在项目设置中获取 <strong>Project Reference ID</strong></li>
+                <li>在账户设置中生成 <strong>Access Token</strong></li>
+                <li>填写下方表单，点击一键配置</li>
+            </ol>
+        </div>
+
+        <div class="setup-section">
+            <div class="section-title">
+                <span class="section-icon">🔑</span>
+                认证信息
+            </div>
+            
+            <div class="input-group">
+                <label for="accessToken">Access Token *</label>
+                <input type="password" id="accessToken" placeholder="请输入您的 Supabase Access Token">
+                <div class="help-text">在 Supabase 账户设置 → Access Tokens 中生成</div>
+            </div>
+
+            <div class="input-group">
+                <label for="projectRef">Project Reference ID *</label>
+                <input type="text" id="projectRef" placeholder="请输入项目引用ID">
+                <div class="help-text">在项目设置 → General → Reference ID 中找到</div>
+            </div>
+        </div>
+
+        <div class="setup-section">
+            <div class="section-title">
+                <span class="section-icon">⚙️</span>
+                配置选项
+            </div>
+            
+            <div class="input-group">
+                <label>
+                    <input type="checkbox" id="createTables" checked> 创建数据表
+                </label>
+            </div>
+            
+            <div class="input-group">
+                <label>
+                    <input type="checkbox" id="setupRLS" checked> 配置行级安全策略
+                </label>
+            </div>
+            
+            <div class="input-group">
+                <label>
+                    <input type="checkbox" id="createIndexes" checked> 创建性能索引
+                </label>
+            </div>
+            
+            <div class="input-group">
+                <label>
+                    <input type="checkbox" id="createViews" checked> 创建统计视图
+                </label>
+            </div>
+        </div>
+
+        <button class="btn" onclick="startAutoSetup()">
+            🚀 开始一键配置
+        </button>
+
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="log-container" id="logContainer"></div>
+        </div>
+
+        <div class="result-section" id="resultSection">
+            <h3 id="resultTitle"></h3>
+            <p id="resultMessage"></p>
+            <div class="config-output" id="configOutput"></div>
+            <button class="copy-btn" onclick="copyConfig()" id="copyBtn" style="display: none;">
+                📋 复制配置代码
+            </button>
+        </div>
+    </div>
+
+    <script src="supabase-auto-config.js"></script>
+    <script>
+        let currentConfig = null;
+        let setupProgress = 0;
+        const totalSteps = 6;
+
+        function addLog(message, type = 'info') {
+            const logContainer = document.getElementById('logContainer');
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry log-${type}`;
+            
+            const timestamp = new Date().toLocaleTimeString();
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        function updateProgress(step, message) {
+            setupProgress = step;
+            const percentage = (step / totalSteps) * 100;
+            document.getElementById('progressFill').style.width = percentage + '%';
+            addLog(message, 'info');
+        }
+
+        async function startAutoSetup() {
+            const accessToken = document.getElementById('accessToken').value.trim();
+            const projectRef = document.getElementById('projectRef').value.trim();
+
+            if (!accessToken || !projectRef) {
+                alert('❌ 请填写所有必需的字段');
+                return;
+            }
+
+            // 显示进度容器
+            document.getElementById('progressContainer').style.display = 'block';
+            document.getElementById('resultSection').style.display = 'none';
+            
+            // 禁用按钮
+            const btn = document.querySelector('.btn');
+            btn.disabled = true;
+            btn.textContent = '⏳ 配置中...';
+
+            try {
+                // 初始化配置器
+                currentConfig = new SupabaseAutoConfig();
+                
+                updateProgress(1, '🚀 开始自动配置 Supabase...');
+                
+                // 获取配置选项
+                const options = {
+                    createTables: document.getElementById('createTables').checked,
+                    setupRLS: document.getElementById('setupRLS').checked,
+                    createIndexes: document.getElementById('createIndexes').checked,
+                    createViews: document.getElementById('createViews').checked
+                };
+
+                // 执行配置步骤
+                updateProgress(2, '📋 验证项目信息...');
+                await currentConfig.getProjectInfo();
+                
+                if (options.createTables) {
+                    updateProgress(3, '🗄️ 创建数据表...');
+                    await currentConfig.createTables();
+                }
+
+                if (options.setupRLS) {
+                    updateProgress(4, '🔒 设置行级安全策略...');
+                    await currentConfig.setupRLS();
+                }
+
+                if (options.createIndexes) {
+                    updateProgress(5, '📈 创建性能索引...');
+                    await currentConfig.createIndexes();
+                }
+
+                if (options.createViews) {
+                    updateProgress(6, '📊 创建统计视图和函数...');
+                    await currentConfig.createViewsAndFunctions();
+                }
+
+                // 生成配置文件
+                addLog('⚙️ 生成配置文件...', 'info');
+                const configContent = await currentConfig.generateConfig();
+
+                // 验证配置
+                addLog('🔍 验证配置...', 'info');
+                const isValid = await currentConfig.validateSetup();
+
+                updateProgress(totalSteps, '✅ 配置完成！');
+                
+                // 显示成功结果
+                showResult(true, '🎉 Supabase 自动配置成功！', configContent);
+                
+            } catch (error) {
+                addLog(`❌ 配置失败: ${error.message}`, 'error');
+                showResult(false, '❌ 配置失败', error.message);
+            } finally {
+                // 恢复按钮
+                btn.disabled = false;
+                btn.textContent = '🚀 开始一键配置';
+            }
+        }
+
+        function showResult(success, title, content) {
+            const resultSection = document.getElementById('resultSection');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultMessage = document.getElementById('resultMessage');
+            const configOutput = document.getElementById('configOutput');
+            const copyBtn = document.getElementById('copyBtn');
+
+            resultSection.className = `result-section ${success ? 'result-success' : 'result-error'}`;
+            resultSection.style.display = 'block';
+            
+            resultTitle.textContent = title;
+            
+            if (success) {
+                resultMessage.textContent = '配置已完成！请将下方的配置代码复制到您的 config.js 文件中。';
+                configOutput.textContent = content;
+                configOutput.style.display = 'block';
+                copyBtn.style.display = 'inline-block';
+            } else {
+                resultMessage.textContent = content;
+                configOutput.style.display = 'none';
+                copyBtn.style.display = 'none';
+            }
+        }
+
+        function copyConfig() {
+            const configOutput = document.getElementById('configOutput');
+            const textArea = document.createElement('textarea');
+            textArea.value = configOutput.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            const copyBtn = document.getElementById('copyBtn');
+            const originalText = copyBtn.textContent;
+            copyBtn.textContent = '✅ 已复制！';
+            setTimeout(() => {
+                copyBtn.textContent = originalText;
+            }, 2000);
+        }
+
+        // 页面加载时的提示
+        window.addEventListener('load', () => {
+            addLog('🌟 欢迎使用 Supabase 一键配置工具！', 'success');
+            addLog('📝 请先填写必要的认证信息，然后点击开始配置', 'info');
+        });
+    </script>
+</body>
+</html>
